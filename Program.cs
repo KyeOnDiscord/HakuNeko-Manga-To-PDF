@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
-
+using PdfSharp.Pdf.IO;
+using System.Threading;
+using System.Diagnostics;
 namespace Images2Pdf
 {
     class Program
     {
         static void Main()
         {
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
             Console.Title = "HakuNeko Manga Chapters To PDF // Made by Kye#5000 | https://github.com/kyeondiscord";
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("==========");
@@ -36,29 +40,74 @@ namespace Images2Pdf
             Console.ReadKey();
             Console.Clear();
             Console.WriteLine($"Creating {dirName}.pdf ...");
-            PdfDocument document = new PdfDocument();
-            int done = 0;
-            foreach (string filename in pages)
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (int i = 0; i < pages.Count + 1; i++)
             {
-                    PdfPage page = document.AddPage();
-                   
-                    // Get an XGraphics object for drawing
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
-                    Bitmap img = new Bitmap(filename);
-                    int imageHeight = img.Height;
-                    int imageWidth = img.Width;
-                    DrawImage(gfx, filename, 0, 0, imageHeight / 2, imageWidth / 2);
-                    done++;
-                    Console.Title = ($"{dirName} | {done}/{pages.Count} Pages done!");
-                    
+                PdfDocument document = new PdfDocument();
+                if (i == 0)
+                {
+                    document = new PdfDocument();
+                }
+                else
+                {
+                    document = CutPDFToMemory("temp.pdf");
+                }
+                
+                if (i < pages.Count)
+                    AddImagePage(document, pages[i]);
+
+
+                Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | "  + (float)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
+                if (i == pages.Count)
+                {
+                    document.Save($"{dirName}.pdf");
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("==========");
+                    Console.WriteLine("HakuNeko Manga Chapters To PDF // Made by Kye#5000 | https://github.com/kyeondiscord");
+                    Console.WriteLine("");
+                    Console.WriteLine($"Exported to {dirName}.pdf !");
+                    Console.WriteLine("==========");
+
+                    Console.ReadLine();
+                }
+                else 
+                    document.Save($"temp.pdf");
             }
-            document.Save($"{dirName}.pdf");
-            Console.WriteLine($"Exported to {dirName}");
-            Console.ReadLine();
+            
         }
-        public static void DrawImage(XGraphics gfx, string image, int x, int y, int height, int width)
+
+        public static void AddImagePage(PdfDocument document, string filename)
         {
-            gfx.DrawImage(XImage.FromFile(image), x, y, width, height);
+            PdfPage page = document.AddPage();
+            // Get an XGraphics object for drawing
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+            Bitmap img = new Bitmap(filename);
+            int imageHeight = img.Height;
+            int imageWidth = img.Width;
+            page.Width = imageWidth;
+            page.Height = imageHeight;
+            gfx.DrawImage(XImage.FromFile(filename), 0, 0, imageWidth,imageHeight );
+        }
+
+
+        public static PdfDocument CutPDFToMemory(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                PdfDocument PDFDoc = PdfReader.Open(filename, PdfDocumentOpenMode.Modify);
+                PdfDocument PDFNewDoc = PDFDoc;
+                PDFDoc.Dispose();
+                File.Delete(filename);
+                return PDFNewDoc;
+            }
+            else
+            {
+                throw new Exception($"{filename} doesn't exist!");
+            }
+                
         }
 
     }
