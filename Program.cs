@@ -59,7 +59,7 @@ namespace Images2Pdf
                     AddImagePage(document, pages[i]);
 
 
-                Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | "  + (float)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
+                Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | "  + (int)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
                 if (i == pages.Count)
                 {
                     document.Save($"{dirName}.pdf");
