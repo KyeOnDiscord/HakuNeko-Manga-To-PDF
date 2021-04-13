@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -25,10 +24,11 @@ namespace Images2Pdf
             Console.ForegroundColor = ConsoleColor.Green;
             string currentdirectory = AppDomain.CurrentDomain.BaseDirectory;
             var dirName = new DirectoryInfo(currentdirectory).Name;
-            string[] pages = Directory.GetFiles(currentdirectory, "*.jpg*", SearchOption.AllDirectories);
-            //string[] pages = images;
+            string[] a = Directory.GetFiles(currentdirectory, "*.jpg*", SearchOption.AllDirectories);
+            Array.Sort(a, new WindowsFileNames());
+            List<string> pages = new List<string>(a);
 
-            if (pages.Length == 0)
+            if (pages.Count == 0)
             {
                 Console.WriteLine("Put this in the folder HakuNeko generates with all the chapters!");
                 Console.ReadKey();
@@ -37,7 +37,7 @@ namespace Images2Pdf
             Console.WriteLine($"Generating {dirName}.pdf");
             Console.Title = $"{dirName} | Initializing...";
 
-            Console.WriteLine($"Found {pages.Length} pages. Press any key to continue...");
+            Console.WriteLine($"Found {pages.Count} pages. Press any key to continue...");
 
             Console.ReadKey();
             Console.Clear();
@@ -45,43 +45,28 @@ namespace Images2Pdf
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int i = 0; i < pages.Length;)
+            PdfDocument document = new PdfDocument();
+            for (int i = 0; i < pages.Count;)
             {
-                PdfDocument document = new PdfDocument();
-                if (i == 0)
-                {
-                    document = new PdfDocument();
-                }
-                else
-                {
+                if (File.Exists("tmp.pdf"))
                     document = CutPDFToMemory("tmp.pdf");
-                }
 
 
-                if (Enumerable.Range(pages.Length - 15, pages.Length).Contains(i))
-                {
-                    AddImagePage(document, pages[i]);
-                    i++;
-                }
-                else
-                {
-                    AddImagePage(document, pages[i]);
-                    AddImagePage(document, pages[i + 1]);
-                    AddImagePage(document, pages[i + 2]);
-                    AddImagePage(document, pages[i + 3]);
-                    AddImagePage(document, pages[i + 4]);
-                    AddImagePage(document, pages[i + 5]);
-                    AddImagePage(document, pages[i + 7]);
-                    i++;
-                    i++;
-                    i++;
-                    i++;
-                    i++;
-                    i++;
-                    i++;
-                }
-                Console.Title = ($"{dirName} | {i}/{pages.Length} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Length) + "%] | " + (int)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
-                if (i == pages.Length)
+                    if (i + 10 < pages.Count)//Check the last pages to see if theres atleast 10 left
+                    {
+                        for (int j = 0; j < 10; j++)
+                        {
+                            AddImagePage(document, pages[i + j]);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        AddImagePage(document, pages[i]);
+                        i++;
+                    }
+                Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | " + (int)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
+                if (i == pages.Count)
                 {
                     document.Save($"{dirName}.pdf");
                     Console.Clear();
@@ -125,7 +110,6 @@ namespace Images2Pdf
             {
                 throw new Exception($"{filename} doesn't exist!");
             }
-                
         }
 
         public static void DrawImage()
@@ -218,5 +202,16 @@ namespace Images2Pdf
         private const int OPEN_EXISTING = 3;
 
 
+        public class WindowsFileNames : IComparer<string>
+        {
+
+            [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+            static extern int StrCmpLogicalW(String x, String y);
+
+            public int Compare(string x, string y)
+            {
+                return StrCmpLogicalW(x, y);
+            }
+        }
     }
 }
