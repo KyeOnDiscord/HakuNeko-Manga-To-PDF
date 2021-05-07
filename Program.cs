@@ -52,7 +52,7 @@ namespace Images2Pdf
                 float mem = CurrentMemorySize;
                 AddImagePage(document, pages[i]);
                 Console.WriteLine("Added " + i + "   | Memory: " + mem);
-                if (mem > 300 + (i * 10 / 2))//Ram until new pdf
+                if (mem > 2048)//2GB of Ram
                 {
                     document.Save("tmp.pdf");
                     document = new PdfDocument();

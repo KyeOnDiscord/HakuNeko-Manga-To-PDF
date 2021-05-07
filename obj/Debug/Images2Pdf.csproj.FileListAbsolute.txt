@@ -1,0 +1,12 @@
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\bin\HakuNekoManga2Pdf.exe
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\bin\HakuNekoManga2Pdf.pdb
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\bin\PdfSharp.xml
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\bin\PdfSharp.Charting.xml
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.csprojAssemblyReference.cache
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.Properties.Resources.resources
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.csproj.GenerateResource.cache
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.csproj.CoreCompileInputs.cache
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.csproj.Fody.CopyLocal.cache
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\Images2Pdf.csproj.CopyComplete
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\HakuNekoManga2Pdf.exe
+C:\Users\ProMa\Documents\GitHub\HakuNeko-Manga-To-PDF\obj\Debug\HakuNekoManga2Pdf.pdb
