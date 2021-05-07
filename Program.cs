@@ -39,6 +39,7 @@ namespace Images2Pdf
 
             Console.WriteLine($"Found {pages.Count} pages. Press any key to continue...");
 
+
             Console.ReadKey();
             Console.Clear();
             Console.WriteLine($"Creating {dirName}.pdf ...");
@@ -46,45 +47,32 @@ namespace Images2Pdf
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             PdfDocument document = new PdfDocument();
-            for (int i = 0; i < pages.Count;)
+            for (int i = 0; i < pages.Count; i ++)
             {
-                if (File.Exists("tmp.pdf"))
-                    document = CutPDFToMemory("tmp.pdf");
-
-
-                    if (i + 10 < pages.Count)//Check the last pages to see if theres atleast 10 left
-                    {
-                        for (int j = 0; j < 10; j++)
-                        {
-                            AddImagePage(document, pages[i + j]);
-                            i++;
-                        }
-                    }
-                    else
-                    {
-                        AddImagePage(document, pages[i]);
-                        i++;
-                    }
-                Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | " + (int)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
-                if (i == pages.Count)
+                float mem = CurrentMemorySize;
+                AddImagePage(document, pages[i]);
+                Console.WriteLine("Added " + i + "   | Memory: " + mem);
+                if (mem > 300 + (i * 10 / 2))//Ram until new pdf
                 {
-                    document.Save($"{dirName}.pdf");
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine("==========");
-                    Console.WriteLine("HakuNeko Manga Chapters To PDF // Made by Kye#5000 | https://github.com/kyeondiscord");
-                    Console.WriteLine("");
-                    Console.WriteLine($"Exported to {dirName}.pdf!");
-                    Console.WriteLine("==========");
-                    DrawImage();
-
-                    Console.WriteLine($"Enjoy your manga :3");
-                    File.Delete("tmp.pdf");
-                    Console.ReadLine();
-                }
-                else
                     document.Save("tmp.pdf");
+                    document = new PdfDocument();
+                    document = CutPDFToMemory("tmp.pdf");
+                }
+            Console.Title = ($"{dirName} | {i}/{pages.Count} Pages Done | [" + (int)Math.Round((double)(100 * i) / pages.Count) + "%] | " + (int)stopwatch.ElapsedMilliseconds / 1000 + " seconds elapsed");
             }
+            document.Save($"{dirName}.pdf");
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("==========");
+            Console.WriteLine("HakuNeko Manga Chapters To PDF // Made by Kye#5000 | https://github.com/kyeondiscord");
+            Console.WriteLine("");
+            Console.WriteLine($"Exported to {dirName}.pdf!");
+            Console.WriteLine("==========");
+            DrawImage();
+
+            Console.WriteLine($"Enjoy your manga :3");
+            File.Delete("tmp.pdf");
+            Console.ReadLine();
         }
         public static void AddImagePage(PdfDocument document, string filename)
         {
@@ -98,18 +86,20 @@ namespace Images2Pdf
             page.Height = imageHeight;
             gfx.DrawImage(XImage.FromFile(filename), 0, 0, imageWidth,imageHeight );
         }
-
+        public static float CurrentMemorySize
+        {
+            get
+            {
+                //ConvertBytesToMegabytes
+                return (Process.GetCurrentProcess().PrivateMemorySize64 / 1024f) / 1024f;
+            }
+        }
+        
 
         public static PdfDocument CutPDFToMemory(string filename)
         {
-            if (File.Exists(filename))
-            {
+            
                 return PdfReader.Open(filename, PdfDocumentOpenMode.Modify);
-            }
-            else
-            {
-                throw new Exception($"{filename} doesn't exist!");
-            }
         }
 
         public static void DrawImage()
